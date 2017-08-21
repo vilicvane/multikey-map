@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "lib": [
+      "esnext"
+    ],
+    "strict": true,
+    "noImplicitReturns": true,
+    "noEmitOnError": true,
+    "noUnusedLocals": true,
+    "declaration": true,
+    "stripInternal": true,
+    "skipDefaultLibCheck": true,
+    "sourceMap": true,
+    "newLine": "LF",
+    "rootDir": "src",
+    "outDir": "bld"
+  }
+}

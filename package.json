@@ -1,0 +1,21 @@
+{
+  "name": "multikey-map",
+  "version": "0.1.0",
+  "description": "Multikey Map",
+  "scripts": {
+    "tsc": "tsc",
+    "tslint": "tslint",
+    "build": "tsc",
+    "lint": "tslint --project tsconfig.json --type-check"
+  },
+  "main": "bld/index.js",
+  "types": "bld/index.d.ts",
+  "repository": "https://github.com/vilic/multikey-map.git",
+  "author": "vilicvane",
+  "license": "MIT",
+  "devDependencies": {
+    "tslint": "^5.6.0",
+    "typescript": "^2.4.2",
+    "vts": "^5.6.1"
+  }
+}
