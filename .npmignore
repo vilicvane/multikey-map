@@ -1,9 +1,7 @@
-.*
-
 /src/
 
-tsconfig.json
-tslint.json
-yarn.lock
+/tsconfig.json
+/tslint.json
+/yarn.lock
 
 .*
