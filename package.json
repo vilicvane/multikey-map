@@ -1,6 +1,6 @@
 {
   "name": "multikey-map",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Multikey Map",
   "scripts": {
     "build": "tsc",
