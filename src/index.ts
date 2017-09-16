@@ -1,8 +1,9 @@
 type GeneralMap<T> = Map<any, T> | WeakMap<any, T>;
 
 interface MultikeyInternalMapValue<T> {
-  map: GeneralMap<MultikeyInternalMapValue<T>>;
-  value?: T;
+  map: GeneralMap<MultikeyInternalMapValue<T>> | undefined;
+  valueSet: boolean;
+  value: T | undefined;
 }
 
 export class MultikeyMap<K extends any[], V> {
@@ -27,7 +28,7 @@ export class MultikeyMap<K extends any[], V> {
   hasAndGet(keys: K): [boolean, V | undefined] {
     let mapValue = this.getMapValueObject(keys);
     return mapValue ?
-      ['value' in mapValue, mapValue.value] :
+      [mapValue.valueSet, mapValue.value] :
       [false, undefined];
   }
 
@@ -40,16 +41,64 @@ export class MultikeyMap<K extends any[], V> {
       let mapValue = map.get(key);
 
       if (!mapValue) {
-        mapValue = {map: createMap<MultikeyInternalMapValue<V>>(weak)};
+        mapValue = {
+          map: undefined,
+          valueSet: false,
+          value: undefined,
+        };
+
         map.set(key, mapValue);
       }
 
-      if (i === keys.length - 1) {
-        mapValue.value = value;
+      if (i < keys.length - 1) {
+        if (mapValue.map) {
+          map = mapValue.map;
+        } else {
+          map = mapValue.map = createMap<MultikeyInternalMapValue<V>>(weak);
+        }
+
+        continue;
       }
 
-      map = mapValue.map;
+      if (!mapValue.valueSet) {
+        mapValue.valueSet = true;
+      }
+
+      mapValue.value = value;
     }
+  }
+
+  delete(keys: K): boolean {
+    let map = this.map;
+
+    for (let i = 0; i < keys.length; i++) {
+      let key = keys[i];
+      let mapValue = map.get(key);
+
+      if (!mapValue) {
+        return false
+      }
+
+      if (i < keys.length - 1) {
+        if (!mapValue.map) {
+          return false;
+        }
+
+        map = mapValue.map;
+        continue;
+      }
+
+      if (mapValue.valueSet) {
+        mapValue.valueSet = false;
+        mapValue.value = undefined;
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    // To pass TypeScript checking.
+    return false;
   }
 
   private getMapValueObject(keys: any[]): MultikeyInternalMapValue<V> | undefined {
@@ -63,13 +112,19 @@ export class MultikeyMap<K extends any[], V> {
         return undefined;
       }
 
-      if (i === keys.length - 1) {
-        return mapValue;
+      if (i < keys.length - 1) {
+        if (!mapValue.map) {
+          return undefined;
+        }
+
+        map = mapValue.map;
+        continue;
       }
 
-      map = mapValue.map;
+      return mapValue;
     }
 
+    // To pass TypeScript checking.
     return undefined;
   }
 }
