@@ -1,18 +1,16 @@
-type GeneralMap<T> = Map<any, T> | WeakMap<any, T>;
+import MixedMap from 'mixed-map';
 
-interface MultikeyInternalMapValue<T> {
-  map: GeneralMap<MultikeyInternalMapValue<T>> | undefined;
+interface MultikeyInternalMapValue<V> {
+  map: MixedMap<any, MultikeyInternalMapValue<V>> | undefined;
   valueSet: boolean;
-  value: T | undefined;
+  value: V | undefined;
 }
 
 export class MultikeyMap<K extends any[], V> {
-  private map: GeneralMap<MultikeyInternalMapValue<V>>;
+  private map: MixedMap<any, MultikeyInternalMapValue<V>>;
 
-  constructor(
-    private weak = false,
-  ) {
-    this.map = createMap<MultikeyInternalMapValue<V>>(weak);
+  constructor() {
+    this.map = new MixedMap<any, MultikeyInternalMapValue<V>>();
   }
 
   get(keys: K): V | undefined {
@@ -34,7 +32,6 @@ export class MultikeyMap<K extends any[], V> {
 
   set(keys: K, value: V): void {
     let map = this.map;
-    let weak = this.weak;
 
     for (let i = 0; i < keys.length; i++) {
       let key = keys[i];
@@ -54,7 +51,7 @@ export class MultikeyMap<K extends any[], V> {
         if (mapValue.map) {
           map = mapValue.map;
         } else {
-          map = mapValue.map = createMap<MultikeyInternalMapValue<V>>(weak);
+          map = mapValue.map = new MixedMap<any, MultikeyInternalMapValue<V>>();
         }
 
         continue;
@@ -76,7 +73,7 @@ export class MultikeyMap<K extends any[], V> {
       let mapValue = map.get(key);
 
       if (!mapValue) {
-        return false
+        return false;
       }
 
       if (i < keys.length - 1) {
@@ -130,7 +127,3 @@ export class MultikeyMap<K extends any[], V> {
 }
 
 export default MultikeyMap;
-
-function createMap<T>(weak: boolean): GeneralMap<T> {
-  return weak ? new WeakMap<any, T>() : new Map<any, T>();
-}

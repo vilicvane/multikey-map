@@ -17,5 +17,8 @@
     "tslint": "^5.6.0",
     "typescript": "^2.4.2",
     "vts": "^5.6.1"
+  },
+  "dependencies": {
+    "mixed-map": "^0.1.0"
   }
 }
