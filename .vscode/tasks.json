@@ -6,9 +6,7 @@
       "type": "shell",
       "command": "yarn tsc -w -p .",
       "isBackground": true,
-      "problemMatcher": [
-        "$tsc-watch"
-      ]
+      "problemMatcher": ["$tsc-watch"]
     }
   ]
 }

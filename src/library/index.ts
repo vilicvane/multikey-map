@@ -1,10 +1,10 @@
-import MixedMap from 'mixed-map';
+import {MixedMap} from 'mixed-map';
 
-interface MultikeyInternalMapValue<V> {
+type MultikeyInternalMapValue<V> = {
   map: MixedMap<any, MultikeyInternalMapValue<V>> | undefined;
   valueSet: boolean;
   value: V | undefined;
-}
+};
 
 export class MultikeyMap<K extends any[], V> {
   private map: MixedMap<any, MultikeyInternalMapValue<V>>;
@@ -14,27 +14,25 @@ export class MultikeyMap<K extends any[], V> {
   }
 
   get(keys: K): V | undefined {
-    let mapValue = this.getMapValueObject(keys);
+    const mapValue = this.getMapValueObject(keys);
     return mapValue ? mapValue.value : undefined;
   }
 
   has(keys: K): boolean {
-    let mapValue = this.getMapValueObject(keys);
+    const mapValue = this.getMapValueObject(keys);
     return mapValue ? 'value' in mapValue : false;
   }
 
   hasAndGet(keys: K): [boolean, V | undefined] {
-    let mapValue = this.getMapValueObject(keys);
-    return mapValue ?
-      [mapValue.valueSet, mapValue.value] :
-      [false, undefined];
+    const mapValue = this.getMapValueObject(keys);
+    return mapValue ? [mapValue.valueSet, mapValue.value] : [false, undefined];
   }
 
   set(keys: K, value: V): void {
     let map = this.map;
 
     for (let i = 0; i < keys.length; i++) {
-      let key = keys[i];
+      const key = keys[i];
       let mapValue = map.get(key);
 
       if (!mapValue) {
@@ -69,8 +67,8 @@ export class MultikeyMap<K extends any[], V> {
     let map = this.map;
 
     for (let i = 0; i < keys.length; i++) {
-      let key = keys[i];
-      let mapValue = map.get(key);
+      const key = keys[i];
+      const mapValue = map.get(key);
 
       if (!mapValue) {
         return false;
@@ -98,12 +96,14 @@ export class MultikeyMap<K extends any[], V> {
     return false;
   }
 
-  private getMapValueObject(keys: any[]): MultikeyInternalMapValue<V> | undefined {
+  private getMapValueObject(
+    keys: any[],
+  ): MultikeyInternalMapValue<V> | undefined {
     let map = this.map;
 
     for (let i = 0; i < keys.length; i++) {
-      let key = keys[i];
-      let mapValue = map.get(key);
+      const key = keys[i];
+      const mapValue = map.get(key);
 
       if (!mapValue) {
         return undefined;

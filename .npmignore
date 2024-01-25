@@ -1,7 +1,4 @@
-/*/test/
-
-/tsconfig.json
-/tslint.json
-/yarn.lock
-
-.*
+*
+!/src/library/**/*.{ts,tsx}
+!/bld/library/**
+*.tsbuildinfo
