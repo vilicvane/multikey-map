@@ -3,7 +3,7 @@
   "boilerplate": "@mufan/code-boilerplates/typescript",
   "options": {
     "name": "multikey-map",
-    "description": "A simple map implementation that supports multiple keys, using ES6 `Map` and `WeakMap` internally.",
+    "description": "A simple map implementation that supports multiple keys.",
     "repository": "https://github.com/vilicvane/multikey-map.git",
     "license": "MIT",
     "author": "vilicvane",
