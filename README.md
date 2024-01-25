@@ -5,7 +5,7 @@
 
 # multikey-map
 
-A simple map implementation that supports multiple keys, using ES6 &#x60;Map&#x60; and &#x60;WeakMap&#x60; internally.
+A simple map implementation that supports multiple keys.
 
 ## License
 
