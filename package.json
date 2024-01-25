@@ -1,6 +1,6 @@
 {
   "name": "multikey-map",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A simple map implementation that supports multiple keys.",
   "repository": "https://github.com/vilicvane/multikey-map.git",
   "license": "MIT",
