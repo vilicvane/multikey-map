@@ -1,7 +1,7 @@
 import MultikeyMap from 'multikey-map';
 
 test('set and get with single key', () => {
-  const map = new MultikeyMap<any[], any>();
+  const map = new MultikeyMap<unknown[], unknown>();
 
   map.set(['foo'], 123);
   map.set(['bar'], 456);
@@ -14,7 +14,7 @@ test('set and get with single key', () => {
 });
 
 test('set and get with multiple keys', () => {
-  const map = new MultikeyMap<any[], any>();
+  const map = new MultikeyMap<[string, string], unknown>();
 
   map.set(['foo', 'pia'], 123);
   map.set(['bar', 'pia'], 456);
@@ -34,50 +34,18 @@ test('set and get with multiple keys', () => {
   expect(map.hasAndGet(['bar', 'xia'])).toEqual([false, undefined]);
   expect(map.get(['ha', 'pia'])).toBe(undefined);
   expect(map.get(['ha'])).toBe(undefined);
-  expect(map.get(['foo'])).toBe(undefined);
-});
-
-test('set value with keys of different lengths', () => {
-  const map = new MultikeyMap<any[], any>();
-
-  map.set(['foo'], 123);
-  map.set(['foo', 'pia'], 456);
-  map.set(['bar', 'pia'], 789);
-  map.set(['bar'], undefined);
-
-  expect(map.get(['foo'])).toBe(123);
-  expect(map.get(['foo', 'pia'])).toBe(456);
-  expect(map.get(['bar', 'pia'])).toBe(789);
-  expect(map.hasAndGet(['bar'])).toEqual([true, undefined]);
-});
-
-test('set value with keys of different lengths', () => {
-  const map = new MultikeyMap<any[], any>();
-
-  map.set(['foo'], 123);
-  map.set(['foo', 'pia'], 456);
-  map.set(['bar', 'pia'], 789);
-  map.set(['bar'], undefined);
-
-  expect(map.get(['foo'])).toBe(123);
-  expect(map.get(['foo', 'pia'])).toBe(456);
-  expect(map.get(['bar', 'pia'])).toBe(789);
-  expect(map.hasAndGet(['bar'])).toEqual([true, undefined]);
+  expect(map.get(['foo'])).toBeInstanceOf(MultikeyMap);
 });
 
 test('delete values', () => {
-  const map = new MultikeyMap<any[], any>();
+  const map = new MultikeyMap<unknown[], unknown>();
 
-  map.set(['foo'], 123);
   map.set(['foo', 'pia'], 456);
   map.set(['bar', 'pia'], 789);
-  map.set(['bar'], undefined);
 
   map.delete(['foo']);
   map.delete(['bar', 'pia']);
 
-  expect(map.hasAndGet(['foo'])).toEqual([false, undefined]);
-  expect(map.get(['foo', 'pia'])).toBe(456);
+  expect(map.get(['foo', 'pia'])).toBe(undefined);
   expect(map.hasAndGet(['bar', 'pia'])).toEqual([false, undefined]);
-  expect(map.hasAndGet(['bar'])).toEqual([true, undefined]);
 });

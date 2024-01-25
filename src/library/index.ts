@@ -1,129 +1,159 @@
 import {MixedMap} from 'mixed-map';
 
-type MultikeyInternalMapValue<V> = {
-  map: MixedMap<any, MultikeyInternalMapValue<V>> | undefined;
-  valueSet: boolean;
-  value: V | undefined;
-};
+type MultikeyInternalMapValue<TValue> =
+  | {map: MixedMap<unknown, MultikeyInternalMapValue<TValue>>}
+  | {value: TValue};
 
-export class MultikeyMap<K extends any[], V> {
-  private map: MixedMap<any, MultikeyInternalMapValue<V>>;
+export class MultikeyMap<TKeys extends unknown[], TValue> {
+  constructor(
+    private map = new MixedMap<unknown, MultikeyInternalMapValue<TValue>>(),
+  ) {}
 
-  constructor() {
-    this.map = new MixedMap<any, MultikeyInternalMapValue<V>>();
-  }
-
-  get(keys: K): V | undefined {
+  get<TPartialKeys extends StrictPartialKeys<TKeys>>(
+    keys: TPartialKeys,
+  ): MultikeyMap<RestKeys<TKeys, TPartialKeys>, TValue> | undefined;
+  get(keys: TKeys): TValue | undefined;
+  get(keys: unknown[]): MultikeyMap<any, TValue> | TValue | undefined {
     const mapValue = this.getMapValueObject(keys);
-    return mapValue ? mapValue.value : undefined;
+
+    if (!mapValue) {
+      return undefined;
+    }
+
+    if ('map' in mapValue) {
+      return new MultikeyMap(mapValue.map);
+    } else {
+      return mapValue.value;
+    }
   }
 
-  has(keys: K): boolean {
+  has(keys: PartialKeys<TKeys>): boolean {
+    return this.getMapValueObject(keys) !== undefined;
+  }
+
+  hasAndGet<TPartialKeys extends StrictPartialKeys<TKeys>>(
+    keys: TPartialKeys,
+  ):
+    | [true, MultikeyMap<RestKeys<TKeys, TPartialKeys>, TValue>]
+    | [false, undefined];
+  hasAndGet(keys: TKeys): [true, TValue] | [false, undefined];
+  hasAndGet(
+    keys: TKeys,
+  ): [boolean, MultikeyMap<any, TValue> | TValue | undefined] {
     const mapValue = this.getMapValueObject(keys);
-    return mapValue ? 'value' in mapValue : false;
+
+    if (!mapValue) {
+      return [false, undefined];
+    }
+
+    if ('map' in mapValue) {
+      return [true, new MultikeyMap(mapValue.map)];
+    } else {
+      return [true, mapValue.value];
+    }
   }
 
-  hasAndGet(keys: K): [boolean, V | undefined] {
-    const mapValue = this.getMapValueObject(keys);
-    return mapValue ? [mapValue.valueSet, mapValue.value] : [false, undefined];
-  }
-
-  set(keys: K, value: V): void {
+  set(keys: TKeys, value: TValue): void {
     let map = this.map;
 
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       let mapValue = map.get(key);
 
-      if (!mapValue) {
-        mapValue = {
-          map: undefined,
-          valueSet: false,
-          value: undefined,
-        };
-
-        map.set(key, mapValue);
-      }
-
       if (i < keys.length - 1) {
-        if (mapValue.map) {
-          map = mapValue.map;
-        } else {
-          map = mapValue.map = new MixedMap<any, MultikeyInternalMapValue<V>>();
+        if (!mapValue || !('map' in mapValue)) {
+          mapValue = {map: new MixedMap()};
+          map.set(key, mapValue);
         }
 
-        continue;
+        map = mapValue.map;
+      } else {
+        if (!mapValue || !('value' in mapValue)) {
+          map.set(key, {value});
+        } else {
+          mapValue.value = value;
+        }
       }
-
-      if (!mapValue.valueSet) {
-        mapValue.valueSet = true;
-      }
-
-      mapValue.value = value;
     }
   }
 
-  delete(keys: K): boolean {
+  delete(keys: PartialKeys<TKeys>): boolean {
     let map = this.map;
 
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      const mapValue = map.get(key);
+    for (let index = 0; index < keys.length; index++) {
+      const key = keys[index];
 
-      if (!mapValue) {
-        return false;
-      }
+      if (index < keys.length - 1) {
+        const mapValue = map.get(key);
 
-      if (i < keys.length - 1) {
-        if (!mapValue.map) {
+        if (!mapValue || !('map' in mapValue)) {
           return false;
         }
 
         map = mapValue.map;
-        continue;
-      }
-
-      if (mapValue.valueSet) {
-        mapValue.valueSet = false;
-        mapValue.value = undefined;
-        return true;
       } else {
-        return false;
+        return map.delete(key);
       }
     }
 
-    // To pass TypeScript checking.
-    return false;
+    throw new Error();
   }
 
   private getMapValueObject(
-    keys: any[],
-  ): MultikeyInternalMapValue<V> | undefined {
+    keys: unknown[],
+  ): MultikeyInternalMapValue<TValue> | undefined {
     let map = this.map;
 
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
+    for (let index = 0; index < keys.length; index++) {
+      const key = keys[index];
       const mapValue = map.get(key);
 
       if (!mapValue) {
         return undefined;
       }
 
-      if (i < keys.length - 1) {
-        if (!mapValue.map) {
+      if (index < keys.length - 1) {
+        if (!('map' in mapValue)) {
           return undefined;
         }
 
         map = mapValue.map;
-        continue;
+      } else {
+        return mapValue;
       }
-
-      return mapValue;
     }
 
-    // To pass TypeScript checking.
-    return undefined;
+    throw new Error();
   }
 }
 
 export default MultikeyMap;
+
+type StrictPartialKeys<TKeys extends unknown[]> = number extends TKeys['length']
+  ? TKeys
+  : __StrictPartialKeys<TKeys>;
+
+type __StrictPartialKeys<TKeys extends unknown[]> = TKeys extends [
+  infer TFirst,
+  ...infer TRest,
+]
+  ? TRest extends []
+    ? never
+    : [TFirst] | [TFirst, ...__StrictPartialKeys<TRest>]
+  : [];
+
+type PartialKeys<TKeys extends unknown[]> = number extends TKeys['length']
+  ? TKeys
+  : __PartialKeys<TKeys>;
+
+type __PartialKeys<TKeys extends unknown[]> = TKeys extends [
+  infer TFirst,
+  ...infer TRest,
+]
+  ? [TFirst] | [TFirst, ...__PartialKeys<TRest>]
+  : [];
+
+type RestKeys<
+  TKeys extends unknown[],
+  TPartialKeys extends unknown[],
+> = TKeys extends [...TPartialKeys, ...infer TRestKeys] ? TRestKeys : never;

@@ -5,14 +5,14 @@
 
 # Multikey Map
 
-A simple map implementation that supports multiple keys, using ES6 `Map` and `WeakMap` internally.
+A simple map implementation that supports multiple keys.
+
+> `multikey-map` uses `mixed-map` internally, which is a map implementation that uses both `Map` and `WeakMap` internally.
 
 ## Installation
 
 ```sh
-yarn add multikey-map
-# or
-npm install multikey-map --save
+npm install multikey-map
 ```
 
 ## Usage
@@ -36,8 +36,6 @@ map.set(['bar', 0], undefined);
 map.get(['bar', 0]); // undefined
 map.has(['bar', 0]); // true
 map.hasAndGet(['bar', 0]); // [true, undefined]
-
-let weakMap = new MultikeyMap<[object, object], number | undefined>(true);
 ```
 
 ## License
