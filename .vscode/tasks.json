@@ -2,11 +2,12 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "taskName": "build",
-      "type": "shell",
-      "command": "yarn tsc -w -p .",
-      "isBackground": true,
-      "problemMatcher": ["$tsc-watch"]
+      "type": "typescript",
+      "tsconfig": "tsconfig.json",
+      "option": "watch",
+      "problemMatcher": ["$tsc-watch"],
+      "group": "build",
+      "label": "tsc: watch - tsconfig.json"
     }
   ]
 }

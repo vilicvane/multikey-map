@@ -33,8 +33,12 @@ test('set and get with multiple keys', () => {
   expect(map.has(['bar', 'xia'])).toBe(false);
   expect(map.hasAndGet(['bar', 'xia'])).toEqual([false, undefined]);
   expect(map.get(['ha', 'pia'])).toBe(undefined);
-  expect(map.get(['ha'])).toBe(undefined);
-  expect(map.get(['foo'])).toBeInstanceOf(MultikeyMap);
+  expect(map.getSubMap(['ha'])).toBe(undefined);
+
+  const fooMap = map.getSubMap(['foo'])!;
+
+  expect(fooMap).toBeInstanceOf(MultikeyMap);
+  expect(fooMap.get(['pia'])).toBe(123);
 });
 
 test('delete values', () => {
@@ -46,6 +50,6 @@ test('delete values', () => {
   map.delete(['foo']);
   map.delete(['bar', 'pia']);
 
-  expect(map.get(['foo', 'pia'])).toBe(undefined);
+  expect(map.get(['foo', 'pia'])).toBe(456);
   expect(map.hasAndGet(['bar', 'pia'])).toEqual([false, undefined]);
 });
